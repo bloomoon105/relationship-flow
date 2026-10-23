@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>관계 흐름 정리</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
 <style>
 :root{--pf:'Noto Sans KR',sans-serif;--bg:#f4f4f6;--panel:#fff;--text:#222;--muted:#777;--line:#ddd;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17171a;--panel:#232327;--text:#eee;--muted:#999;--line:#3a3a40}}
@@ -156,9 +156,18 @@ function buildG(f){
   g.items.slice(0,S.m).forEach((it,i)=>{const c=S.g.chars[i];f.append(card(c.name,tx('말풍선',()=>it.bub,v=>it.bub=v),row(file('이미지',v=>it.img=v),rg('확대',()=>it.z,v=>it.z=v,100,250)),row(...[0,1,2].map(k=>rg(S.labels[k],()=>it.v[k],v=>it.v[k]=v)))))});
  }
  const b=document.createElement('button');b.textContent='PNG 이미지로 저장';
- b.onclick=async()=>{b.textContent='만드는 중...';try{const c=await html2canvas($('cap'),{scale:2,useCORS:true,backgroundColor:null});const w=window.open('');const img=new Image();img.src=c.toDataURL('image/png');if(w){w.document.title='관계도';w.document.body.style.margin=0;w.document.body.appendChild(img)}else alert('팝업을 허용해 주세요')}catch(e){alert('저장 실패')}b.textContent='PNG 이미지로 저장'};
+ b.onclick=()=>savePNG(b);
  const r=document.createElement('button');r.textContent='초기화';r.style.background='#666';r.onclick=()=>{if(confirm('모두 초기화할까요?')){S=JSON.parse(JSON.stringify(DEF));build();render()}};
  f.append(b,r);
+}
+async function savePNG(btn){
+ if(!window.htmlToImage){alert('저장 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.');return}
+ btn.textContent='저장 중...';
+ try{const o={pixelRatio:2,cacheBust:true,style:{transform:'none'}};
+  await htmlToImage.toBlob($('cap'),o);const b=await htmlToImage.toBlob($('cap'),o);
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='관계-흐름.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
+ catch(e){alert('저장에 실패했어요')}
+ btn.textContent='PNG 이미지로 저장';
 }
 function segs(){const w=mk('<label>단계 수</label>');const r=document.createElement('div');r.className='row';[1,2,3].forEach(n=>{const b=document.createElement('button');b.textContent=n+'단계';b.style.marginTop='0';b.style.background=S.n==n?'#666':G;b.onclick=()=>{S.n=n;build();render()};r.appendChild(b)});w.appendChild(r);return w}
 function sec(t){const h=document.createElement('h2');h.textContent=t;return h}
@@ -181,15 +190,12 @@ function build(){
   for(let k=0;k<3;k++)f.append(row(rg('왼쪽 '+S.labels[k],()=>g.vL[k],v=>g.vL[k]=v),rg('오른쪽 '+S.labels[k],()=>g.vR[k],v=>g.vR[k]=v)));
  });
  const b=document.createElement('button');b.textContent='PNG 이미지로 저장';
- b.onclick=async()=>{b.textContent='만드는 중...';try{const c=await html2canvas($('cap'),{scale:2,useCORS:true,backgroundColor:null});
-  const w=window.open('');const img=new Image();img.src=c.toDataURL('image/png');
-  if(w){w.document.title='관계도';w.document.body.style.margin=0;w.document.body.appendChild(img)}else alert('팝업을 허용해 주세요');}catch(e){alert('저장 실패')}b.textContent='PNG 이미지로 저장'};
+ b.onclick=()=>savePNG(b);
  const r=document.createElement('button');r.textContent='초기화';r.style.background='#666';r.onclick=()=>{if(confirm('모두 초기화할까요?')){S=JSON.parse(JSON.stringify(DEF));build();render()}};
  f.append(b,r);
 }
 function fit(){const cap=$('cap'),box=$('fit'),w=cap.offsetWidth,h=cap.offsetHeight;let s=Math.min(1,box.parentElement.clientWidth/w);if(innerWidth>=1000&&$('fitc').checked)s=Math.min(s,(innerHeight-70)/h);s=Math.max(.2,s);cap.style.transformOrigin='0 0';cap.style.transform=`scale(${s})`;box.style.width=w*s+'px';box.style.height=h*s+'px'}
 const _render=render;render=function(){_render();fit()};
-const _h2c=window.html2canvas;window.html2canvas=async(e,o)=>{const t=$('cap').style.transform;$('cap').style.transform='none';try{return await _h2c(e,o)}finally{$('cap').style.transform=t}};
 $('fitc').onchange=fit;addEventListener('resize',fit);if(document.fonts)document.fonts.ready.then(fit);
 build();render();
 </script>
