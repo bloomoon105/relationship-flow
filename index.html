@@ -76,19 +76,20 @@ textarea{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6
 </div>
 <script>
 const G='#bdbec1';
-const DEF={m:2,tc:G,rc:G,n:3,logo:'',ls:80,bg:G,g:{chars:[0,1,2,3].map(()=>({name:'이름',color:G,th:''})),stages:[0,1].map(()=>({rel:'관계',items:[0,1,2,3].map((_,i)=>({img:'',z:100,bub:'대사',v:[20+i*20,20+i*20,20+i*20]}))}))},title:'페어명',nameL:'이름',nameR:'이름',cL:G,cR:G,fs:19,rs:23,ts:44,nc:'#ffffff',rg:15,af:true,labels:['친밀도','신뢰도','호감도'],thL:'',thR:'',
+const DEF={m:2,tc:G,rc:G,n:3,logo:'',ls:80,bg:G,g:{chars:[0,1,2,3].map(()=>({name:'이름',color:G,nc:'#ffffff',th:''})),stages:[0,1].map(()=>({rel:'관계',items:[0,1,2,3].map((_,i)=>({img:'',z:100,bub:'대사',v:[20+i*20,20+i*20,20+i*20]}))}))},title:'페어명',nameL:'이름',nameR:'이름',cL:G,cR:G,fs:19,rs:23,ts:44,ncL:'#ffffff',ncR:'#ffffff',cbg:'#ffffff',bl:true,rg:15,af:true,labels:['친밀도','신뢰도','호감도'],thL:'',thR:'',
 stages:[0,1,2].map(()=>({rel:'관계',bT:'대사',bB:'대사',imgL:'',imgR:'',zL:100,zR:100,vL:[44,44,44],vR:[50,50,50]}))};
 let S=JSON.parse(JSON.stringify(DEF));
 try{const s=localStorage.getItem('relchart4');if(s)S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(s))}catch(e){}
 try{S.g.stages.forEach(st=>{if(st.rel.indexOf('한명')>-1)st.rel='관계';st.items.forEach((it,i)=>{if(it.v.every(x=>x==50))it.v=[20+i*20,20+i*20,20+i*20]})})}catch(e){}
+try{if(S.nc&&S.nc!='#ffffff'){if(S.ncL=='#ffffff')S.ncL=S.nc;if(S.ncR=='#ffffff')S.ncR=S.nc;S.g.chars.forEach(c=>{if(!c.nc||c.nc=='#ffffff')c.nc=S.nc})}delete S.nc}catch(e){}
 const $=id=>document.getElementById(id);
 function save(){try{localStorage.setItem('relchart4',JSON.stringify(S))}catch(e){}}
-function rib(side,color,name){
- return `<div class="rib" style="${side}:147px"><svg viewBox="0 0 50 119"><polygon points="0,0 50,0 50,119 25,94.5 0,119" fill="${color}"/></svg><span style="font-size:${S.fs}px;color:${S.nc}">${name}</span></div>`;
+function rib(side,color,name,nc){
+ return `<div class="rib" style="${side}:147px"><svg viewBox="0 0 50 119"><polygon points="0,0 50,0 50,119 25,94.5 0,119" fill="${color}"/></svg><span style="font-size:${S.fs}px;color:${nc}">${name}</span></div>`;
 }
-function bub(txt,color,flip){
+function bub(txt,color,flip,tc){
  const p='M14.5 0H161.5A14.5 14.5 0 0 1 176 14.5V21C176 28 177 33 178.5 37C171 35.5 164 33 158 29H14.5A14.5 14.5 0 0 1 0 14.5A14.5 14.5 0 0 1 14.5 0Z';
- return `<div class="bub"><svg viewBox="-6 -12 190 52"><path d="${p}" fill="${color}"${flip?' transform="rotate(180 88 14.5)"':''}/></svg><span>${txt}</span></div>`;
+ return `<div class="bub" style="color:${S.bl!==false?tc:'#fff'}"><svg viewBox="-6 -12 190 52"><path d="${p}" fill="${color}"${flip?' transform="rotate(180 88 14.5)"':''}/></svg><span>${txt}</span></div>`;
 }
 function slider(label,val,color,left,th){
  const fill=left?`left:${val}%;right:0`:`left:0;width:${val}%`;
@@ -99,14 +100,14 @@ function slider(label,val,color,left,th){
  return `<div class="side">${left?lab+tr:tr+lab}</div>`;
 }
 function render(){
- $('cap').style.background=S.gr?`linear-gradient(${S.ga==null?180:S.ga}deg,${S.bg},${S.bg2||'#eeeeee'})`:S.bg;$('cap').style.width=S.m>2?'1000px':'700px';if(S.m>2){renderGroup();save();return}
- let h=rib('left',S.cL,S.nameL)+rib('right',S.cR,S.nameR)+`<div class="ttl" style="color:${S.tc};font-size:${S.ts}px">${S.logo?`<img src="${S.logo}" style="max-width:215px;max-height:${S.ls}px">`:S.title}</div>`;
+ $('card').style.background=S.cbg||'#ffffff';$('cap').style.background=S.gr?`linear-gradient(${S.ga==null?180:S.ga}deg,${S.bg},${S.bg2||'#eeeeee'})`:S.bg;$('cap').style.width=S.m>2?'1000px':'700px';if(S.m>2){renderGroup();save();return}
+ let h=rib('left',S.cL,S.nameL,S.ncL)+rib('right',S.cR,S.nameR,S.ncR)+`<div class="ttl" style="color:${S.tc};font-size:${S.ts}px">${S.logo?`<img src="${S.logo}" style="max-width:215px;max-height:${S.ls}px">`:S.title}</div>`;
  S.stages.slice(0,S.n).forEach((g,i)=>{
   const im=(src,z)=>src?`<img src="${src}" style="transform:scale(${z/100})">`:'';
   h+=`<div class="stage"><div class="circ">${im(g.imgL,g.zL)}</div>
-  <div class="mid">${bub(g.bT,S.cR,false)}
+  <div class="mid">${bub(g.bT,S.cR,false,S.ncR)}
   <div class="relbox"><div class="q">우리의 관계는?</div><div class="rw"><div class="rt"><div class="dots"><i></i><i></i></div><div class="rel" style="color:${S.rc};font-size:${S.rs}px">${g.rel.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>')}</div></div></div></div>
-  ${bub(g.bB,S.cL,true)}</div>
+  ${bub(g.bB,S.cL,true,S.ncL)}</div>
   <div class="circ">${im(g.imgR,g.zR)}</div></div><div class="sl"><div class="sr">`;
   for(let k=0;k<3;k++)h+=slider(S.labels[k],g.vL[k],S.cL,true,S.thL)+slider(S.labels[k],g.vR[k],S.cR,false,S.thR);
   h+=`</div></div>`;
@@ -127,11 +128,11 @@ function gslide(g,k,left){const C=S.g.chars;let th='';for(let i=0;i<S.m;i++){con
  const lab=`<div class="lb${left?'':' R'}" style="color:${S.cL}">${S.labels[k]}</div>`,tr=`<div class="trk">${th}</div>`;return `<div class="gs">${left?lab+tr:tr+lab}</div>`}
 function renderGroup(){
  const n=S.m,C=S.g.chars;
- const gr=c=>`<div class="gr"><svg viewBox="0 0 40 95"><polygon points="0,0 40,0 40,95 20,76 0,95" fill="${c.color}"/></svg><span style="font-size:${S.fs}px;color:${S.nc}">${c.name}</span></div>`;
+ const gr=c=>`<div class="gr"><svg viewBox="0 0 40 95"><polygon points="0,0 40,0 40,95 20,76 0,95" fill="${c.color}"/></svg><span style="font-size:${S.fs}px;color:${c.nc||'#ffffff'}">${c.name}</span></div>`;
  const ttl=`<div class="gtt" style="color:${S.tc};font-size:${S.ts}px">${S.logo?`<img src="${S.logo}" style="max-width:240px;max-height:${S.ls}px">`:S.title}</div>`;
  const pair=a=>`<div style="display:flex;gap:4px">${a.map(gr).join('')}</div>`;
  let h=n==3?`<div class="gh c3">${pair(C.slice(0,3))}${ttl}</div>`:`<div class="gh">${pair(C.slice(0,2))}${ttl}${pair(C.slice(2,4))}</div>`;
- const cell=(g,i,top,area)=>{const it=g.items[i],c=C[i];const circ=`<div class="circ">${it.img?`<img src="${it.img}" style="transform:scale(${it.z/100})">`:''}</div>`;const b=`<div class="gb ${top?'d':'u'}" style="--c:${c.color}">${it.bub}</div>`;return `<div class="gc" style="grid-area:${area}">${top?b+circ:circ+b}</div>`};
+ const cell=(g,i,top,area)=>{const it=g.items[i],c=C[i];const circ=`<div class="circ">${it.img?`<img src="${it.img}" style="transform:scale(${it.z/100})">`:''}</div>`;const b=`<div class="gb ${top?'d':'u'}" style="--c:${c.color};color:${S.bl!==false?(c.nc||'#ffffff'):'#fff'}">${it.bub}</div>`;return `<div class="gc" style="grid-area:${area}">${top?b+circ:circ+b}</div>`};
  const panel=(g,left)=>{
   const cells=n==3?cell(g,0,true,'1/1/2/4')+cell(g,1,false,'2/1/3/2')+cell(g,2,false,'2/3/3/4'):cell(g,0,true,'1/1/2/2')+cell(g,1,false,'2/1/3/2')+cell(g,2,true,'1/3/2/4')+cell(g,3,false,'2/3/3/4');
   const rel=g.rel.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
@@ -151,10 +152,10 @@ function buildG(f){
   f.append(tx('페어명',()=>S.title,v=>S.title=v),logoCtl(),
    row(rg('이름 글자 크기',()=>S.fs,v=>S.fs=v,10,24),rg('페어명 글자 크기',()=>S.ts,v=>S.ts=v,20,80)),
    rg('관계 글자 크기',()=>S.rg,v=>S.rg=v,10,48),afCtl(),
-   row(col('배경색',()=>S.bg,v=>S.bg=v),col('페어명 색',()=>S.tc,v=>S.tc=v),col('관계 색',()=>S.rc,v=>S.rc=v),col('이름 색',()=>S.nc,v=>S.nc=v)),gradCtl(),
+   row(col('바깥 배경색',()=>S.bg,v=>S.bg=v),col('카드 배경색',()=>S.cbg||'#ffffff',v=>S.cbg=v),col('페어명 색',()=>S.tc,v=>S.tc=v),col('관계 색',()=>S.rc,v=>S.rc=v)),blCtl(),gradCtl(),
    row(tx('항목1',()=>S.labels[0],v=>S.labels[0]=v),tx('항목2',()=>S.labels[1],v=>S.labels[1]=v),tx('항목3',()=>S.labels[2],v=>S.labels[2]=v)),
    row(rg('아이콘 크기',()=>S.ic||26,v=>S.ic=v,14,60),rg('기본 점 크기',()=>S.dot||14,v=>S.dot=v,8,30)));
-  C.forEach((c,i)=>f.append(card('인물 '+(i+1),row(tx('이름',()=>c.name,v=>c.name=v),col('색',()=>c.color,v=>c.color=v)),file('슬라이더 아이콘',v=>c.th=v))));
+  C.forEach((c,i)=>f.append(card('인물 '+(i+1),row(tx('이름',()=>c.name,v=>c.name=v),col('리본 색',()=>c.color,v=>c.color=v),col('이름 색',()=>c.nc||'#ffffff',v=>c.nc=v)),file('슬라이더 아이콘',v=>c.th=v))));
  }else{
   const g=S.g.stages[GT-1];
   const w=mk('<label>관계 문장 (줄바꿈 가능, **굵게**)</label><textarea rows="2"></textarea>');const ta=w.querySelector('textarea');ta.value=g.rel;ta.oninput=()=>{g.rel=ta.value;render()};f.append(w);
@@ -165,6 +166,7 @@ function buildG(f){
  const r=document.createElement('button');r.textContent='초기화';r.style.background='#666';r.onclick=()=>{if(confirm('모두 초기화할까요?')){S=JSON.parse(JSON.stringify(DEF));build();render()}};
  f.append(b,r);
 }
+function blCtl(){const w=mk('<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" style="width:auto"> 대사 글자색을 이름 색과 같게</label>');const c=w.querySelector('input');c.checked=S.bl!==false;c.onchange=()=>{S.bl=c.checked;render()};return w}
 function gradCtl(){const w=mk('<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" style="width:auto"> 배경 그라데이션 사용</label>');const c=w.querySelector('input');c.checked=!!S.gr;c.onchange=()=>{S.gr=c.checked;render()};const d=document.createElement('div');d.append(w,row(col('끝 색',()=>S.bg2||'#eeeeee',v=>S.bg2=v),rg('각도',()=>S.ga==null?180:S.ga,v=>S.ga=v,0,360)));return d}
 async function savePNG(btn){
  if(!window.htmlToImage){alert('저장 도구를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.');return}
@@ -183,8 +185,8 @@ function build(){
  f.append(sec('전체 설정'),modes(),segs(),tx('페어명',()=>S.title,v=>S.title=v),logoCtl(),
   row(tx('왼쪽 이름',()=>S.nameL,v=>S.nameL=v),tx('오른쪽 이름',()=>S.nameR,v=>S.nameR=v)),
   row(rg('이름 글자 크기',()=>S.fs,v=>S.fs=v,10,30),rg('관계 글자 크기',()=>S.rs,v=>S.rs=v,10,48)),afCtl(),
-  rg('페어명 글자 크기',()=>S.ts,v=>S.ts=v,20,80),row(col('페어명 색',()=>S.tc,v=>S.tc=v),col('관계 색',()=>S.rc,v=>S.rc=v),col('이름 색',()=>S.nc,v=>S.nc=v)),
-  row(col('배경색',()=>S.bg,v=>S.bg=v),col('왼쪽 색',()=>S.cL,v=>S.cL=v),col('오른쪽 색',()=>S.cR,v=>S.cR=v)),gradCtl(),
+  rg('페어명 글자 크기',()=>S.ts,v=>S.ts=v,20,80),row(col('페어명 색',()=>S.tc,v=>S.tc=v),col('관계 색',()=>S.rc,v=>S.rc=v),col('바깥 배경색',()=>S.bg,v=>S.bg=v),col('카드 배경색',()=>S.cbg||'#ffffff',v=>S.cbg=v)),
+  row(col('왼쪽 색',()=>S.cL,v=>S.cL=v),col('왼쪽 이름 색',()=>S.ncL,v=>S.ncL=v),col('오른쪽 색',()=>S.cR,v=>S.cR=v),col('오른쪽 이름 색',()=>S.ncR,v=>S.ncR=v)),blCtl(),gradCtl(),
   row(tx('항목1',()=>S.labels[0],v=>S.labels[0]=v),tx('항목2',()=>S.labels[1],v=>S.labels[1]=v),tx('항목3',()=>S.labels[2],v=>S.labels[2]=v)),
   row(file('왼쪽 슬라이더 아이콘',v=>S.thL=v),file('오른쪽 슬라이더 아이콘',v=>S.thR=v)),
   row(rg('아이콘 크기',()=>S.ic||26,v=>S.ic=v,14,60),rg('기본 점 크기',()=>S.dot||14,v=>S.dot=v,8,30)));
