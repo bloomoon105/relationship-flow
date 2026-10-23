@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>관계도 메이커</title>
+<title>관계 흐름 정리</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -15,6 +15,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:14px 'Noto Sans KR',sa
 .app{display:flex;gap:16px;padding:16px;align-items:flex-start;flex-wrap:wrap}
 .form{flex:1 1 320px;max-width:460px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
 .view{flex:2 1 400px;min-width:0;overflow-x:auto}
+@media (min-width:1000px){.view{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto}}
 h2{font-size:15px;margin:14px 0 8px;padding-top:10px;border-top:1px solid var(--line)}
 h2:first-child{border:0;margin-top:0;padding:0}
 label{display:block;font-size:12px;color:var(--muted);margin:6px 0 2px}
@@ -69,7 +70,7 @@ textarea{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6
 <body>
 <div class="app">
 <div class="form" id="form"></div>
-<div class="view"><div id="cap"><div class="card" id="card"></div></div></div>
+<div class="view"><label style="display:block;font-size:12px;color:var(--muted);margin-bottom:6px"><input type="checkbox" id="fitc" checked> 화면에 맞춰 미리보기 축소</label><div id="fit"><div id="cap"><div class="card" id="card"></div></div></div></div>
 </div>
 <script>
 const G='#bdbec1';
@@ -186,6 +187,10 @@ function build(){
  const r=document.createElement('button');r.textContent='초기화';r.style.background='#666';r.onclick=()=>{if(confirm('모두 초기화할까요?')){S=JSON.parse(JSON.stringify(DEF));build();render()}};
  f.append(b,r);
 }
+function fit(){const cap=$('cap'),box=$('fit'),w=cap.offsetWidth,h=cap.offsetHeight;let s=Math.min(1,box.parentElement.clientWidth/w);if(innerWidth>=1000&&$('fitc').checked)s=Math.min(s,(innerHeight-70)/h);s=Math.max(.2,s);cap.style.transformOrigin='0 0';cap.style.transform=`scale(${s})`;box.style.width=w*s+'px';box.style.height=h*s+'px'}
+const _render=render;render=function(){_render();fit()};
+const _h2c=window.html2canvas;window.html2canvas=async(e,o)=>{const t=$('cap').style.transform;$('cap').style.transform='none';try{return await _h2c(e,o)}finally{$('cap').style.transform=t}};
+$('fitc').onchange=fit;addEventListener('resize',fit);if(document.fonts)document.fonts.ready.then(fit);
 build();render();
 </script>
 </body>
