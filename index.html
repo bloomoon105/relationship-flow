@@ -61,7 +61,7 @@ button{padding:9px 14px;border:0;border-radius:8px;background:#8a8c90;color:#fff
 .gb::after{content:'';position:absolute;left:50%;margin-left:-5px;border-style:solid}
 .gb.d::after{top:23px;border-width:7px 5px 0;border-color:var(--c) transparent transparent}.gb.u::after{bottom:23px;border-width:0 5px 7px;border-color:transparent transparent var(--c)}
 .gt{align-self:center;width:100%;display:flex;justify-content:center}.gi{text-align:left}.gt .q{padding-left:14px}
-.gv{position:relative;padding-left:14px;white-space:pre-wrap;font-size:15px;line-height:1.35;color:#aaa;font-weight:300}.gv b{font-weight:900;color:#888}
+.gv{position:relative;padding-left:14px;white-space:pre-wrap;font-size:15px;line-height:1.35;color:#aaa;font-weight:300}.gv b{font-weight:900}
 .gv::before{content:'';position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:#bdbec1;box-shadow:0 8px 0 #bdbec1}
 .gsl{padding:0 4px;margin-top:18px}.gs{display:flex;align-items:center;min-height:32px}
 textarea{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text);font:inherit}
@@ -74,7 +74,7 @@ textarea{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:6
 </div>
 <script>
 const G='#bdbec1';
-const DEF={m:2,tc:G,n:3,logo:'',ls:80,bg:G,g:{chars:[0,1,2,3].map(()=>({name:'이름',color:G,th:''})),stages:[0,1].map(()=>({rel:'관계',items:[0,1,2,3].map((_,i)=>({img:'',z:100,bub:'대사',v:[20+i*20,20+i*20,20+i*20]}))}))},title:'페어명',nameL:'이름',nameR:'이름',cL:G,cR:G,fs:19,rs:23,ts:44,labels:['친밀도','신뢰도','호감도'],thL:'',thR:'',
+const DEF={m:2,tc:G,rc:G,n:3,logo:'',ls:80,bg:G,g:{chars:[0,1,2,3].map(()=>({name:'이름',color:G,th:''})),stages:[0,1].map(()=>({rel:'관계',items:[0,1,2,3].map((_,i)=>({img:'',z:100,bub:'대사',v:[20+i*20,20+i*20,20+i*20]}))}))},title:'페어명',nameL:'이름',nameR:'이름',cL:G,cR:G,fs:19,rs:23,ts:44,labels:['친밀도','신뢰도','호감도'],thL:'',thR:'',
 stages:[0,1,2].map(()=>({rel:'관계',bT:'대사',bB:'대사',imgL:'',imgR:'',zL:100,zR:100,vL:[44,44,44],vR:[50,50,50]}))};
 let S=JSON.parse(JSON.stringify(DEF));
 try{const s=localStorage.getItem('relchart4');if(s)S=Object.assign(JSON.parse(JSON.stringify(DEF)),JSON.parse(s))}catch(e){}
@@ -103,7 +103,7 @@ function render(){
   const im=(src,z)=>src?`<img src="${src}" style="transform:scale(${z/100})">`:'';
   h+=`<div class="stage"><div class="circ">${im(g.imgL,g.zL)}</div>
   <div class="mid">${bub(g.bT,S.cR,false)}
-  <div class="relbox"><div class="q">우리의 관계는?</div><div class="rw"><div class="dots"><i></i><i></i></div><div class="rel" style="color:${S.cL};font-size:${S.rs}px">${g.rel}</div></div></div>
+  <div class="relbox"><div class="q">우리의 관계는?</div><div class="rw"><div class="dots"><i></i><i></i></div><div class="rel" style="color:${S.rc};font-size:${S.rs}px">${g.rel}</div></div></div>
   ${bub(g.bB,S.cL,true)}</div>
   <div class="circ">${im(g.imgR,g.zR)}</div></div><div class="sl"><div class="sr">`;
   for(let k=0;k<3;k++)h+=slider(S.labels[k],g.vL[k],S.cL,true,S.thL)+slider(S.labels[k],g.vR[k],S.cR,false,S.thR);
@@ -131,7 +131,7 @@ function renderGroup(){
  const panel=(g,left)=>{
   const cells=n==3?cell(g,0,true,'1/1/2/4')+cell(g,1,false,'2/1/3/2')+cell(g,2,false,'2/3/3/4'):cell(g,0,true,'1/1/2/2')+cell(g,1,false,'2/1/3/2')+cell(g,2,true,'1/3/2/4')+cell(g,3,false,'2/3/3/4');
   const rel=g.rel.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
-  const txt=`<div class="gt" style="grid-area:${n==3?'2/2/3/3;align-self:start;margin-top:10px':'1/2/3/3'}"><div class="gi"><div class="q">우리의 관계는?</div><div class="gv">${rel}</div></div></div>`;
+  const txt=`<div class="gt" style="grid-area:${n==3?'2/2/3/3;align-self:start;margin-top:10px':'1/2/3/3'}"><div class="gi"><div class="q">우리의 관계는?</div><div class="gv" style="color:${S.rc}">${rel}</div></div></div>`;
   return `<div class="gp"><div class="gg">${cells}${txt}</div><div class="gsl">${[0,1,2].map(k=>gslide(g,k,left)).join('')}</div></div>`};
  const arrow=`<div class="ga"><svg viewBox="0 0 40 24" width="40" height="24"><path d="M5 12H22" stroke="#bdbec1" stroke-width="9" stroke-linecap="round"/><path d="M22 4L34 12L22 20Z" fill="#bdbec1" stroke="#bdbec1" stroke-width="6" stroke-linejoin="round"/></svg></div>`;
  h+=`<div class="gps">${panel(S.g.stages[0],true)}${arrow}${panel(S.g.stages[1],false)}</div>`;
@@ -146,7 +146,7 @@ function buildG(f){
  if(GT==0){
   f.append(tx('페어명',()=>S.title,v=>S.title=v),logoCtl(),
    row(rg('이름 글자 크기',()=>S.fs,v=>S.fs=v,10,24),rg('페어명 글자 크기',()=>S.ts,v=>S.ts=v,20,80)),
-   row(col('배경색',()=>S.bg,v=>S.bg=v),col('페어명 색',()=>S.tc,v=>S.tc=v)),gradCtl(),
+   row(col('배경색',()=>S.bg,v=>S.bg=v),col('페어명 색',()=>S.tc,v=>S.tc=v),col('관계 색',()=>S.rc,v=>S.rc=v)),gradCtl(),
    row(tx('항목1',()=>S.labels[0],v=>S.labels[0]=v),tx('항목2',()=>S.labels[1],v=>S.labels[1]=v),tx('항목3',()=>S.labels[2],v=>S.labels[2]=v)),
    row(rg('아이콘 크기',()=>S.ic||26,v=>S.ic=v,14,60),rg('기본 점 크기',()=>S.dot||14,v=>S.dot=v,8,30)));
   C.forEach((c,i)=>f.append(card('인물 '+(i+1),row(tx('이름',()=>c.name,v=>c.name=v),col('색',()=>c.color,v=>c.color=v)),file('슬라이더 아이콘',v=>c.th=v))));
@@ -178,7 +178,7 @@ function build(){
  f.append(sec('전체 설정'),modes(),segs(),tx('페어명',()=>S.title,v=>S.title=v),logoCtl(),
   row(tx('왼쪽 이름',()=>S.nameL,v=>S.nameL=v),tx('오른쪽 이름',()=>S.nameR,v=>S.nameR=v)),
   row(rg('이름 글자 크기',()=>S.fs,v=>S.fs=v,10,30),rg('관계 글자 크기',()=>S.rs,v=>S.rs=v,14,36)),
-  rg('페어명 글자 크기',()=>S.ts,v=>S.ts=v,20,80),col('페어명 색',()=>S.tc,v=>S.tc=v),
+  rg('페어명 글자 크기',()=>S.ts,v=>S.ts=v,20,80),row(col('페어명 색',()=>S.tc,v=>S.tc=v),col('관계 색',()=>S.rc,v=>S.rc=v)),
   row(col('배경색',()=>S.bg,v=>S.bg=v),col('왼쪽 색',()=>S.cL,v=>S.cL=v),col('오른쪽 색',()=>S.cR,v=>S.cR=v)),gradCtl(),
   row(tx('항목1',()=>S.labels[0],v=>S.labels[0]=v),tx('항목2',()=>S.labels[1],v=>S.labels[1]=v),tx('항목3',()=>S.labels[2],v=>S.labels[2]=v)),
   row(file('왼쪽 슬라이더 아이콘',v=>S.thL=v),file('오른쪽 슬라이더 아이콘',v=>S.thR=v)),
